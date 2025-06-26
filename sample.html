@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leave Management Chatbot Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        #chat-container {
+            height: 70vh;
+        }
+        .user-message {
+            align-self: flex-end;
+            background-color: #3b82f6; /* blue-500 */
+            color: white;
+        }
+        .assistant-message {
+            align-self: flex-start;
+            background-color: #e5e7eb; /* gray-200 */
+            color: #1f2937; /* gray-800 */
+        }
+        .message-content {
+            white-space: pre-wrap; /* Ensures newlines in agent responses are rendered */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    <div class="w-full max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-4 sm:p-8">
+
+        <!-- Login View -->
+        <div id="login-view">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Leave System Login</h1>
+            <p class="text-gray-600 mb-6">Enter your credentials to start a session.</p>
+            <form id="login-form">
+                <div class="mb-4">
+                    <label for="employee_id" class="block text-gray-700 text-sm font-bold mb-2">Employee ID</label>
+                    <input type="text" id="employee_id" class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" value="E002" required>
+                </div>
+                <div class="mb-6">
+                    <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                    <input type="password" id="password" class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" value="pass456" required>
+                </div>
+                <button type="submit" id="login-button" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline transition-transform transform hover:scale-105">
+                    Login
+                </button>
+            </form>
+            <p id="login-error" class="text-red-500 text-xs italic mt-4 text-center"></p>
+        </div>
+
+        <!-- Chat View -->
+        <div id="chat-view" class="hidden">
+            <div class="flex justify-between items-center mb-4">
+                 <h1 class="text-3xl font-bold text-gray-800">HR Chat Assistant</h1>
+                 <button id="logout-button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg text-sm">Logout</button>
+            </div>
+           
+            <div id="chat-container" class="border rounded-lg p-4 overflow-y-auto flex flex-col space-y-4 bg-gray-50 mb-4">
+                <!-- Chat messages will be appended here -->
+            </div>
+            <form id="chat-form" class="flex items-center space-x-4">
+                <input type="text" id="message-input" class="flex-grow shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ask about leave or request time off..." required>
+                <button type="submit" id="send-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg focus:outline-none focus:shadow-outline transition-transform transform hover:scale-105">
+                    Send
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const loginView = document.getElementById('login-view');
+        const chatView = document.getElementById('chat-view');
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+        const loginButton = document.getElementById('login-button');
+        const chatForm = document.getElementById('chat-form');
+        const chatContainer = document.getElementById('chat-container');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        const logoutButton = document.getElementById('logout-button');
+
+        const API_URL = 'http://127.0.0.1:5001';
+        let authToken = null;
+        let chatHistory = []; // <-- STATE: Holds the conversation history
+
+        // --- Event Listeners ---
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loginError.textContent = '';
+            loginButton.disabled = true;
+            loginButton.textContent = 'Logging in...';
+
+            const employeeId = document.getElementById('employee_id').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch(`${API_URL}/api/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ employee_id: employeeId, password: password }),
+                });
+
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Login failed');
+
+                authToken = data.token;
+                switchToChatView();
+
+            } catch (error) {
+                loginError.textContent = `Error: ${error.message}`;
+            } finally {
+                loginButton.disabled = false;
+                loginButton.textContent = 'Login';
+            }
+        });
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            // Add user message to history immediately for a responsive UI
+            chatHistory.push({ role: 'user', content: message });
+            renderChatHistory();
+            messageInput.value = '';
+            sendButton.disabled = true;
+            sendButton.textContent = '...';
+
+            try {
+                const response = await fetch(`${API_URL}/api/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`,
+                    },
+                    // *** FIX: Send the current message AND the entire history ***
+                    body: JSON.stringify({ 
+                        message: message, 
+                        history: chatHistory.slice(0, -1) // Send history *before* the new user message
+                    }),
+                });
+
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Failed to get a response.');
+                
+                // *** FIX: Replace local history with the authoritative history from the server ***
+                chatHistory = data.history;
+                renderChatHistory();
+
+            } catch (error) {
+                addMessageToChat('assistant', `Sorry, an error occurred: ${error.message}`);
+            } finally {
+                sendButton.disabled = false;
+                sendButton.textContent = 'Send';
+            }
+        });
+        
+        logoutButton.addEventListener('click', () => {
+            authToken = null;
+            chatHistory = []; // Clear history on logout
+            chatContainer.innerHTML = '';
+            loginError.textContent = 'You have been logged out.';
+            switchToLoginView();
+        });
+
+        // --- UI Helper Functions ---
+
+        function switchToChatView() {
+            loginView.classList.add('hidden');
+            chatView.classList.remove('hidden');
+            // Add initial greeting without adding to history
+            addMessageToChat('assistant', 'Hello! How can I help you with your leave today?');
+        }
+        
+        function switchToLoginView() {
+            chatView.classList.add('hidden');
+            loginView.classList.remove('hidden');
+        }
+
+        function renderChatHistory() {
+            chatContainer.innerHTML = '';
+            chatHistory.forEach(msg => {
+                addMessageToChat(msg.role, msg.content);
+            });
+        }
+
+        function addMessageToChat(role, text) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('max-w-xl', 'rounded-xl', 'px-4', 'py-2', 'break-words', 'message-content');
+            messageElement.textContent = text;
+
+            if (role === 'user') {
+                messageElement.classList.add('user-message');
+            } else {
+                messageElement.classList.add('assistant-message');
+            }
+            
+            chatContainer.appendChild(messageElement);
+            chatContainer.scrollTop = chatContainer.scrollHeight; // Auto-scroll
+        }
+    </script>
+</body>
+</html>
