@@ -84,4 +84,3 @@ def answer_general_question(question: str) -> str:
     except Exception as e:
         logging.error(f"RAG general question failed: {e}")
         return "I'm sorry, I encountered an error trying to find an answer in the policy document."
-

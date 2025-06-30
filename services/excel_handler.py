@@ -113,4 +113,3 @@ def get_leave_history(employee_id: str) -> list:
         df = _load_sheet('LeaveRequests'); employee_history = df[df['employee_id'] == employee_id]
         return employee_history.to_dict('records') if not employee_history.empty else []
     except: return []
-
