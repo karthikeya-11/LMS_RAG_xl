@@ -3,132 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leave Management Chatbot Test</title>
+    <title>t.a.c - HR Assistant</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
+        body { font-family: 'Inter', sans-serif; }
+        .t-a-c-gradient { background-image: linear-gradient(to right, #0f172a, #1e293b); }
+        #chat-container { scroll-behavior: smooth; }
+        .user-message { background-color: #2563eb; color: white; }
+        .assistant-message { background-color: #e2e8f0; color: #1e293b; }
+        .message-bubble {
+            max-width: 80%;
+            word-wrap: break-word;
         }
-        #chat-container {
-            height: 70vh;
+        .message-content strong { color: #0f172a; }
+        .loader {
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
-        .user-message {
-            align-self: flex-end;
-            background-color: #3b82f6; /* blue-500 */
-            color: white;
-        }
-        .assistant-message {
-            align-self: flex-start;
-            background-color: #e5e7eb; /* gray-200 */
-            color: #1f2937; /* gray-800 */
-        }
-        .message-content {
-            white-space: pre-wrap; /* Ensures newlines in agent responses are rendered */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<body class="bg-slate-100 flex items-center justify-center min-h-screen p-4">
 
-    <div class="w-full max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-4 sm:p-8">
+    <div class="w-full max-w-lg mx-auto bg-white rounded-2xl shadow-2xl flex flex-col" style="height: 90vh; max-height: 800px;">
+
+        <!-- Header -->
+        <header class="t-a-c-gradient text-white p-4 rounded-t-2xl shadow-md flex justify-between items-center flex-shrink-0">
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                </div>
+                <div>
+                    <h1 id="header-title" class="text-xl font-bold">t.a.c HR Assistant</h1>
+                    <p id="user-info" class="text-xs text-slate-300"></p>
+                </div>
+            </div>
+            <button id="logout-button" class="hidden bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-3 rounded-lg text-xs transition-opacity">Logout</button>
+        </header>
 
         <!-- Login View -->
-        <div id="login-view">
-            <h1 class="text-3xl font-bold text-gray-800 mb-2">Leave System Login</h1>
-            <p class="text-gray-600 mb-6">Enter your credentials to start a session.</p>
+        <div id="login-view" class="p-8 flex-grow flex flex-col justify-center">
+            <h2 class="text-2xl font-bold text-slate-800 mb-2 text-center">Welcome Back</h2>
+            <p class="text-slate-500 mb-8 text-center">Login to manage your leave.</p>
             <form id="login-form">
                 <div class="mb-4">
-                    <label for="employee_id" class="block text-gray-700 text-sm font-bold mb-2">Employee ID</label>
-                    <input type="text" id="employee_id" class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" value="E002" required>
+                    <label for="employee_id" class="block text-slate-700 text-sm font-bold mb-2">Employee ID</label>
+                    <input type="text" id="employee_id" class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-slate-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" value="E002" required>
                 </div>
                 <div class="mb-6">
-                    <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password</label>
-                    <input type="password" id="password" class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" value="pass456" required>
+                    <label for="password" class="block text-slate-700 text-sm font-bold mb-2">Password</label>
+                    <input type="password" id="password" class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-slate-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" value="pass456" required>
                 </div>
-                <button type="submit" id="login-button" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline transition-transform transform hover:scale-105">
-                    Login
+                <button type="submit" id="login-button" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline transition-transform transform hover:scale-105 flex items-center justify-center">
+                    <span id="login-button-text">Login</span>
                 </button>
             </form>
             <p id="login-error" class="text-red-500 text-xs italic mt-4 text-center"></p>
         </div>
 
         <!-- Chat View -->
-        <div id="chat-view" class="hidden">
-            <div class="flex justify-between items-center mb-4">
-                 <h1 class="text-3xl font-bold text-gray-800">HR Chat Assistant</h1>
-                 <button id="logout-button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg text-sm">Logout</button>
-            </div>
-           
-            <div id="chat-container" class="border rounded-lg p-4 overflow-y-auto flex flex-col space-y-4 bg-gray-50 mb-4">
+        <div id="chat-view" class="hidden flex-grow flex flex-col bg-slate-50 overflow-hidden">
+            <div id="chat-container" class="flex-grow p-6 overflow-y-auto space-y-4">
                 <!-- Chat messages will be appended here -->
             </div>
-            <form id="chat-form" class="flex items-center space-x-4">
-                <input type="text" id="message-input" class="flex-grow shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ask about leave or request time off..." required>
-                <button type="submit" id="send-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg focus:outline-none focus:shadow-outline transition-transform transform hover:scale-105">
-                    Send
+            <div id="typing-indicator" class="px-6 py-3 text-slate-500 text-sm hidden flex-shrink-0">
+                <div class="flex items-center space-x-2">
+                    <div class="loader"></div>
+                    <span>Assistant is typing...</span>
+                </div>
+            </div>
+            <form id="chat-form" class="p-4 border-t border-slate-200 bg-white rounded-b-2xl flex items-center space-x-3 flex-shrink-0">
+                <input type="text" id="message-input" class="flex-grow bg-slate-100 border-transparent rounded-lg py-3 px-4 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ask about leave or time off..." required autocomplete="off">
+                <button type="submit" id="send-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-full focus:outline-none focus:shadow-outline transition-transform transform hover:scale-105 flex items-center justify-center">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                 </button>
             </form>
         </div>
     </div>
 
     <script>
+        // --- DOM Elements ---
         const loginView = document.getElementById('login-view');
         const chatView = document.getElementById('chat-view');
         const loginForm = document.getElementById('login-form');
         const loginError = document.getElementById('login-error');
         const loginButton = document.getElementById('login-button');
+        const loginButtonText = document.getElementById('login-button-text');
         const chatForm = document.getElementById('chat-form');
         const chatContainer = document.getElementById('chat-container');
         const messageInput = document.getElementById('message-input');
         const sendButton = document.getElementById('send-button');
         const logoutButton = document.getElementById('logout-button');
+        const userInfo = document.getElementById('user-info');
+        const typingIndicator = document.getElementById('typing-indicator');
 
+        // --- State Management ---
         const API_URL = 'http://127.0.0.1:5001';
         let authToken = null;
-        let chatHistory = []; // <-- STATE: Holds the conversation history
 
         // --- Event Listeners ---
-
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            loginError.textContent = '';
-            loginButton.disabled = true;
-            loginButton.textContent = 'Logging in...';
-
-            const employeeId = document.getElementById('employee_id').value;
-            const password = document.getElementById('password').value;
-
+            setLoginLoading(true);
             try {
                 const response = await fetch(`${API_URL}/api/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ employee_id: employeeId, password: password }),
+                    body: JSON.stringify({ 
+                        employee_id: document.getElementById('employee_id').value, 
+                        password: document.getElementById('password').value 
+                    }),
                 });
-
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error || 'Login failed');
-
                 authToken = data.token;
-                switchToChatView();
-
+                switchToChatView(data.employee_name, data.employee_id);
             } catch (error) {
                 loginError.textContent = `Error: ${error.message}`;
             } finally {
-                loginButton.disabled = false;
-                loginButton.textContent = 'Login';
+                setLoginLoading(false);
             }
         });
 
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const message = messageInput.value.trim();
-            if (!message) return;
+            const messageText = messageInput.value.trim();
+            if (!messageText || sendButton.disabled) return;
 
-            // Add user message to history immediately for a responsive UI
-            chatHistory.push({ role: 'user', content: message });
-            renderChatHistory();
+            addMessageToChat('user', messageText);
             messageInput.value = '';
-            sendButton.disabled = true;
-            sendButton.textContent = '...';
+            setChatLoading(true);
 
             try {
                 const response = await fetch(`${API_URL}/api/chat`, {
@@ -137,70 +151,96 @@
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${authToken}`,
                     },
-                    // *** FIX: Send the current message AND the entire history ***
-                    body: JSON.stringify({ 
-                        message: message, 
-                        history: chatHistory.slice(0, -1) // Send history *before* the new user message
-                    }),
+                    body: JSON.stringify({ message: messageText }),
                 });
 
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error || 'Failed to get a response.');
                 
-                // *** FIX: Replace local history with the authoritative history from the server ***
-                chatHistory = data.history;
-                renderChatHistory();
+                renderFullHistory(data.full_history);
 
             } catch (error) {
-                addMessageToChat('assistant', `Sorry, an error occurred: ${error.message}`);
+                addMessageToChat('assistant', `Sorry, an error occurred: ${error.message}`, true);
             } finally {
-                sendButton.disabled = false;
-                sendButton.textContent = 'Send';
+                setChatLoading(false);
             }
         });
         
         logoutButton.addEventListener('click', () => {
             authToken = null;
-            chatHistory = []; // Clear history on logout
-            chatContainer.innerHTML = '';
-            loginError.textContent = 'You have been logged out.';
             switchToLoginView();
         });
 
         // --- UI Helper Functions ---
+        function setLoginLoading(isLoading) {
+            loginError.textContent = '';
+            loginButton.disabled = isLoading;
+            loginButtonText.textContent = isLoading ? 'Logging in...' : 'Login';
+            loginButton.classList.toggle('opacity-75', isLoading);
+        }
 
-        function switchToChatView() {
+        function setChatLoading(isLoading) {
+            messageInput.disabled = isLoading;
+            sendButton.disabled = isLoading;
+            typingIndicator.classList.toggle('hidden', !isLoading);
+            if(isLoading) chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function switchToChatView(employeeName, employeeId) {
             loginView.classList.add('hidden');
             chatView.classList.remove('hidden');
-            // Add initial greeting without adding to history
-            addMessageToChat('assistant', 'Hello! How can I help you with your leave today?');
+            logoutButton.classList.remove('hidden');
+            userInfo.textContent = `${employeeName} (${employeeId})`;
+            
+            chatContainer.innerHTML = '';
+            addMessageToChat('assistant', `Hello ${employeeName}! How can I help you with your leave today?`);
         }
         
         function switchToLoginView() {
             chatView.classList.add('hidden');
             loginView.classList.remove('hidden');
-        }
-
-        function renderChatHistory() {
+            logoutButton.classList.add('hidden');
+            userInfo.textContent = '';
             chatContainer.innerHTML = '';
-            chatHistory.forEach(msg => {
-                addMessageToChat(msg.role, msg.content);
-            });
+            loginError.textContent = 'You have been logged out.';
         }
 
-        function addMessageToChat(role, text) {
+        function renderFullHistory(messages) {
+            chatContainer.innerHTML = ''; 
+            if (messages) {
+                messages.forEach(msg => {
+                    if (msg.content && (msg.type === 'human' || msg.type === 'ai')) {
+                         const role = msg.type === 'human' ? 'user' : 'assistant';
+                         addMessageToChat(role, msg.content);
+                    }
+                });
+            }
+        }
+
+        function addMessageToChat(role, text, isError = false) {
+            const messageWrapper = document.createElement('div');
+            messageWrapper.classList.add('flex', 'flex-col');
+            
             const messageElement = document.createElement('div');
-            messageElement.classList.add('max-w-xl', 'rounded-xl', 'px-4', 'py-2', 'break-words', 'message-content');
-            messageElement.textContent = text;
+            messageElement.classList.add('message-bubble', 'rounded-xl', 'px-4', 'py-3');
+            
+            const messageContent = document.createElement('div');
+            messageContent.classList.add('message-content');
+            messageContent.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
 
             if (role === 'user') {
+                messageWrapper.classList.add('items-end');
                 messageElement.classList.add('user-message');
             } else {
+                messageWrapper.classList.add('items-start');
                 messageElement.classList.add('assistant-message');
+                if (isError) messageElement.classList.add('bg-red-100', 'text-red-800');
             }
             
-            chatContainer.appendChild(messageElement);
-            chatContainer.scrollTop = chatContainer.scrollHeight; // Auto-scroll
+            messageElement.appendChild(messageContent);
+            messageWrapper.appendChild(messageElement);
+            chatContainer.appendChild(messageWrapper);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
     </script>
 </body>
