@@ -1,127 +1,133 @@
-# 💼 tech.at.core – LMS & HR Services Bot
+# tech.at.core - LMS & HR Services Bot
 
-A smart, AI-powered HR assistant built for **tech.at.core**, designed to simplify and automate the leave management system using state-of-the-art LLMs and LangGraph workflows.
+## 1. Overview
 
----
+This project is a sophisticated, AI-powered HR Assistant for **tech.at.core**, designed to streamline the leave management process for our employees. Built with Python, Flask, and the powerful LangChain/LangGraph framework, this chatbot provides a conversational interface for handling a variety of leave-related tasks.
 
-## 📌 Overview
+The agent is designed to be intelligent and stateful. It can answer questions about company leave policies by searching a PDF document (RAG), manage a multi-step leave application process with memory, and apply common-sense rules to user requests.
 
-The **tech.at.core LMS Bot** is a conversational AI assistant that integrates directly into your team’s workflow (via Microsoft Teams), enabling employees to handle their leave-related needs seamlessly. Leveraging **LangChain + LangGraph**, the bot offers stateful conversations, policy-aware answers, and intelligent task automation.
+## 2. Features
 
-This project is crafted using **Python, Flask, LangGraph, FAISS, and OpenAI’s GPT-4o**, delivering a complete end-to-end system combining intelligent routing, retrieval-augmented generation (RAG), and real-time task execution.
+- **Integrated, Intelligent & Always Available**
+- **🧩 Built into Microsoft Teams** – Works where your team already communicates
+- **⚡ Instant Responses** – No more waiting on HR for basic queries
+- **🕐 Available 24/7** – Accessible anytime, even outside office hours
+- **📚 Policy-Aware** – Answers backed by the official leave policy document
 
----
+### What Can It Do?
+- Check Leave Balance
+- View Leave History
+- Submit Leave Request
+- Ask Policy Questions
+- View Company Holidays
 
-## 🚀 Key Features
+## 3. Screenshots
 
-### 🔄 Integrated & Intelligent
-- **LangGraph-powered state machine** enables memory across multi-turn conversations.
-- **RAG-based answers** sourced directly from the company's official policy document.
+*(Space to add screenshots of the application in action)*
 
-### 💬 HR Tasks Made Conversational
-- ✅ **Check Leave Balance** – Instantly view your remaining leave.
-- 📆 **View Leave History** – Track your past leave records.
-- 📝 **Submit Leave Request** – Guided, step-by-step leave application flow.
-- 📖 **Ask HR Policy Questions** – Natural language Q&A with grounded answers.
-- 📅 **View Company Holidays** – Get a calendar overview of all holidays.
+![Screenshot 1](placeholder_for_image_url_1.png)
+![Screenshot 2](placeholder_for_image_url_2.png)
 
-### ⚙️ Productivity-Boosting
-- ⚡ **Instant Responses** – No delays or HR wait time.
-- 🧩 **Built into Microsoft Teams** – Use where your team already works.
-- 🌐 **Accessible 24/7** – Anytime access, even outside office hours.
-- 🔐 **Secure Auth** – JWT-based authentication and role validation.
+## 4. Tech Stack
 
----
+- **Backend:** Python, Flask
+- **AI & Orchestration:** LangChain, LangGraph
+- **LLM:** OpenAI (gpt-4o)
+- **Vector Store:** FAISS (for RAG)
+- **Data Storage:** Pandas (for reading/writing to Excel)
+- **Frontend:** HTML, Tailwind CSS, JavaScript
 
-## 📸 Screenshots
+## 5. Project Structure
 
-> *(Add application demo screenshots here)*  
-> E.g., Chat UI, Leave Balance Card, Leave Flow Walkthrough, Policy Q&A
-
----
-
-## 🛠️ Tech Stack
-
-| Layer          | Technologies Used                                     |
-|----------------|--------------------------------------------------------|
-| **Backend**    | Python, Flask                                          |
-| **Frontend**   | HTML, Tailwind CSS, JavaScript                         |
-| **AI/Logic**   | OpenAI GPT-4o, LangChain, LangGraph                    |
-| **RAG/Memory** | FAISS (Vector Store), Pandas (Excel data management)   |
-| **Storage**    | Excel (employee_leave_data.xlsx)                       |
-| **Auth**       | JWT Token-based authentication                         |
-
----
-
-Tech at Core - Employee Leave Management System
-🧱 Project Structure
-tech-at-core/
+```
+.
 ├── agent/
-│   ├── agent_graph.py      # LangGraph logic (nodes, routing, memory)
-│   ├── prompts.py          # System prompts for tools and agent personality
-│   └── tools.py            # Tool functions: RAG, Excel data ops, etc.
+│   ├── agent_graph.py      # Core logic for the LangGraph state machine.
+│   ├── prompts.py          # System prompts that define the agent's personality and rules.
+│   └── tools.py            # Defines all the functions the agent can call (RAG, Excel checks, etc.).
 ├── api/
-│   ├── main.py             # Main Flask app and routes
-│   └── auth.py             # JWT login/authentication handling
+│   ├── main.py             # The main Flask application, defines API endpoints.
+│   └── auth.py             # Handles JWT token creation and validation.
 ├── data/
-│   ├── employee_leave_data.xlsx  # Excel file acting as employee database
-│   └── faiss_index/       # Vector store index from leave policy PDF
+│   ├── employee_leave_data.xlsx # The "database" for employee and leave information.
+│   └── faiss_index/        # The vector store created from the policy PDF.
 ├── docs/
-│   └── Leave Policy-2.pdf  # Source PDF used for RAG Q&A
+│   └── Leave Policy-2.pdf  # The source document for the RAG system.
 ├── services/
-│   ├── excel_handler.py    # Read/write operations for Excel DB
-│   └── policy_rag.py       # RAG pipeline setup using LangChain + FAISS
-├── tech_at_core_chatbot.html  # Simple web UI (or Teams-compatible frontend)
-├── .env                    # Environment variables (OpenAI API key, etc.)
-├── requirements.txt        # Python dependencies
-└── README.md              # You're reading this file
-⚙️ Setup & Installation
-1. Clone the Repository
-bashgit clone <your-repository-url>
+│   ├── excel_handler.py    # Functions for reading from and writing to the Excel file.
+│   └── policy_rag.py       # Manages the RAG chain for answering policy questions.
+├── .env                    # Stores environment variables (e.g., API keys).
+├── requirements.txt        # Lists all Python dependencies.
+└── tech_at_core_chatbot.html # The frontend user interface.
+```
+
+## 6. Setup and Installation
+
+Follow these steps to get the application running on your local machine.
+
+### Step 1: Clone the Repository
+
+```bash
+git clone <your-repository-url>
 cd <your-repository-name>
-2. Create a Virtual Environment
-bash# For Windows
+```
+
+### Step 2: Create a Virtual Environment
+
+It's highly recommended to use a virtual environment to manage dependencies.
+
+```bash
+# For Windows
 python -m venv venv
 venv\Scripts\activate
 
 # For macOS/Linux
 python3 -m venv venv
 source venv/bin/activate
-3. Install Dependencies
-bashpip install -r requirements.txt
-4. Set Environment Variables
-Create a .env file in the root directory and add:
-envOPENAI_API_KEY="your-openai-api-key"
-▶️ Running the Application
-Step 1: Start the Backend Server
-bashflask --app api.main run --port 5001
-The Flask server will start at:
-📍 http://127.0.0.1:5001
-Step 2: Open the Frontend
-Open the file tech_at_core_chatbot.html in your browser.
-Use the following test credentials:
-yamlEmployee ID: E002  
-Password: pass456
-🧠 How It Works: Agent Architecture
-The core logic is powered by a LangGraph state machine, built to handle stateful, intelligent conversations using nodes and edges:
-🟢 Initializer Node
-Loads conversation memory and determines the current "bookmark" (e.g., mid-process location) for that user.
-🔁 Router Node
-Detects user intent and routes the request to the correct tool or flow (e.g., leave process or policy Q&A).
-📥 Leave Flow Nodes
-A structured 3-step process:
+```
 
-leave_gather: Gathers leave details
-leave_confirm: Confirms user request
-leave_submit: Final submission and update
+### Step 3: Install Dependencies
 
-🛠️ Tool Executor Node
-Executes single-turn utilities:
+Install all the required Python libraries from the `requirements.txt` file.
 
-Check leave balance
-View leave history
-Search policy document (RAG)
-View holiday calendar
+```bash
+pip install -r requirements.txt
+```
 
-💾 Stateful Memory
-LangGraph maintains persistent context (e.g., employee ID) across steps to avoid re-asking redundant questions.
+### Step 4: Set Up Environment Variables
+
+Create a file named `.env` in the root directory of the project and add your OpenAI API key:
+
+```
+OPENAI_API_KEY="your-openai-api-key-here"
+```
+
+## 7. Running the Application
+
+### Step 1: Start the Backend Server
+
+Run the Flask application from the root directory.
+
+```bash
+flask --app api.main run --port 5001
+```
+
+The server will start, and you will see the running URL in your terminal (usually `http://127.0.0.1:5001`).
+
+### Step 2: Open the Frontend
+
+Open the `tech_at_core_chatbot.html` file in your web browser. You can simply double-click the file.
+
+You can now log in using the dummy credentials (e.g., Employee ID: `E002`, Password: `pass456`) and start interacting with the chatbot.
+
+## 8. How It Works: The Agent Architecture
+
+The core of this application is the **LangGraph State Machine** defined in `agent/agent_graph.py`. Unlike a simple chain, this graph allows the agent to have a robust, multi-step memory and make intelligent decisions.
+
+- **Initializer (`initialize_node`):** This is the entry point for every message. It loads the conversation's memory and ensures the agent knows which user it's talking to. It then reads a "bookmark" to see if it's in the middle of a process.
+
+- **Router (`router_node`):** This is the agent's main brain. For new topics, it analyzes the user's intent and decides whether to answer a question with a tool or to start the leave application process.
+
+- **Leave Flow Nodes (`leave_gather`, `leave_confirm`, `leave_submit`):** These nodes form a sub-process. Each node is responsible for one step of the leave application. After each step, the graph **stops and waits** for the user's reply, ensuring the conversation doesn't get stuck in a loop.
+
+- **Tool Executor (`tool_executor_node`):** This node is responsible for running simple, one-shot tools like checking a leave balance or performing a RAG search on the policy document.
