@@ -23,10 +23,12 @@ The agent is designed to be intelligent and stateful. It can answer questions ab
 
 ## 3. Screenshots
 
-*(Space to add screenshots of the application in action)*
+<img src="https://github.com/karthikeya-11/LMS_RAG_xl/blob/new-v3/image.png?raw=true" />
+<img src="[https://github.com/karthikeya-11/LMS_RAG_xl/blob/new-v3/image.png?raw=true](https://github.com/karthikeya-11/LMS_RAG_xl/blob/new-v3/image_png.png?raw=true)" />
 
-![Screenshot 1](placeholder_for_image_url_1.png)
-![Screenshot 2](placeholder_for_image_url_2.png)
+
+
+
 
 ## 4. Tech Stack
 
