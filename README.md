@@ -24,7 +24,9 @@ The agent is designed to be intelligent and stateful. It can answer questions ab
 ## 3. Screenshots
 
 <img src="https://github.com/karthikeya-11/LMS_RAG_xl/blob/new-v3/image.png?raw=true" />
-<img src="[https://github.com/karthikeya-11/LMS_RAG_xl/blob/new-v3/image.png?raw=true](https://github.com/karthikeya-11/LMS_RAG_xl/blob/new-v3/image_png.png?raw=true)" />
+
+
+<img src="https://github.com/karthikeya-11/LMS_RAG_xl/blob/new-v3/image_png.png?raw=true" />
 
 
 
