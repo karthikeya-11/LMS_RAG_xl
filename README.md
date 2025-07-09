@@ -53,76 +53,75 @@ This project is crafted using **Python, Flask, LangGraph, FAISS, and OpenAI’s 
 
 ---
 
-## 🧱 Project Structure
-
+Tech at Core - Employee Leave Management System
+🧱 Project Structure
 tech-at-core/
 ├── agent/
-│ ├── agent_graph.py # LangGraph logic (nodes, state machine)
-│ ├── prompts.py # System prompts for various tasks
-│ └── tools.py # Tools like RAG, leave balance, etc.
+│   ├── agent_graph.py      # LangGraph logic (nodes, routing, memory)
+│   ├── prompts.py          # System prompts for tools and agent personality
+│   └── tools.py            # Tool functions: RAG, Excel data ops, etc.
 ├── api/
-│ ├── main.py # Flask API server
-│ └── auth.py # JWT-based login logic
+│   ├── main.py             # Main Flask app and routes
+│   └── auth.py             # JWT login/authentication handling
 ├── data/
-│ ├── employee_leave_data.xlsx # Excel-based employee data
-│ └── faiss_index/ # Vector DB index from policy PDF
+│   ├── employee_leave_data.xlsx  # Excel file acting as employee database
+│   └── faiss_index/       # Vector store index from leave policy PDF
 ├── docs/
-│ └── Leave Policy-2.pdf # Leave policy PDF for RAG search
+│   └── Leave Policy-2.pdf  # Source PDF used for RAG Q&A
 ├── services/
-│ ├── excel_handler.py # Read/write leave data from Excel
-│ └── policy_rag.py # RAG system with FAISS + LangChain
-├── tech_at_core_chatbot.html # Frontend (MS Teams-compatible)
-├── .env # Environment config (e.g., API keys)
-├── requirements.txt # Python dependencies
-└── README.md # You're reading this file
----
-
-## ⚙️ Setup & Installation
-
-### 1. Clone the Repository
-```bash
-git clone <your-repository-url>
+│   ├── excel_handler.py    # Read/write operations for Excel DB
+│   └── policy_rag.py       # RAG pipeline setup using LangChain + FAISS
+├── tech_at_core_chatbot.html  # Simple web UI (or Teams-compatible frontend)
+├── .env                    # Environment variables (OpenAI API key, etc.)
+├── requirements.txt        # Python dependencies
+└── README.md              # You're reading this file
+⚙️ Setup & Installation
+1. Clone the Repository
+bashgit clone <your-repository-url>
 cd <your-repository-name>
-2. Create Virtual Environment
-# Windows
+2. Create a Virtual Environment
+bash# For Windows
 python -m venv venv
 venv\Scripts\activate
 
-# macOS/Linux
+# For macOS/Linux
 python3 -m venv venv
 source venv/bin/activate
-
 3. Install Dependencies
-pip install -r requirements.txt
-
+bashpip install -r requirements.txt
 4. Set Environment Variables
-Create a .env file in the root directory:
-
-OPENAI_API_KEY="your-openai-api-key"
-
+Create a .env file in the root directory and add:
+envOPENAI_API_KEY="your-openai-api-key"
 ▶️ Running the Application
-Start the Flask Backend
-flask --app api.main run --port 5001
-The server will start on:
+Step 1: Start the Backend Server
+bashflask --app api.main run --port 5001
+The Flask server will start at:
 📍 http://127.0.0.1:5001
-
-Open the Frontend
-Open tech_at_core_chatbot.html in your browser.
-Log in using test credentials:
-
-Employee ID: E002
+Step 2: Open the Frontend
+Open the file tech_at_core_chatbot.html in your browser.
+Use the following test credentials:
+yamlEmployee ID: E002  
 Password: pass456
-
-
 🧠 How It Works: Agent Architecture
+The core logic is powered by a LangGraph state machine, built to handle stateful, intelligent conversations using nodes and edges:
+🟢 Initializer Node
+Loads conversation memory and determines the current "bookmark" (e.g., mid-process location) for that user.
+🔁 Router Node
+Detects user intent and routes the request to the correct tool or flow (e.g., leave process or policy Q&A).
+📥 Leave Flow Nodes
+A structured 3-step process:
 
-🧩 LangGraph-Based Flow
-🟢 Initializer Node: Sets user context and reads state "bookmark."
+leave_gather: Gathers leave details
+leave_confirm: Confirms user request
+leave_submit: Final submission and update
 
-🔁 Router Node: Detects user intent, routes to relevant tool or flow.
+🛠️ Tool Executor Node
+Executes single-turn utilities:
 
-📥 Leave Application Nodes: Step-by-step flow: Gather → Confirm → Submit.
+Check leave balance
+View leave history
+Search policy document (RAG)
+View holiday calendar
 
-🛠️ Tool Executor: Executes stateless tools like leave balance check or RAG Q&A.
-
-📚 Memory: Employee ID and leave status persist across messages using LangGraph memory.
+💾 Stateful Memory
+LangGraph maintains persistent context (e.g., employee ID) across steps to avoid re-asking redundant questions.
