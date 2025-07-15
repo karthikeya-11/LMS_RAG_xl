@@ -1,2 +1,6 @@
 .env
 venv/
+run_create_excel.py
+run_create_vector_store.py
+sample.html
+
